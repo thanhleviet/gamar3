@@ -14,6 +14,8 @@ output:
 IMAGES:
 Insert them with: ![alt text](image.png)
 You can also resize them if needed: convert image.png -resize 50% image.png
+If you want to center the image, go through HTML code:
+<div style="text-align:center"><img src ="image.png"/></div>
 
 REFERENCES:
 For references: Put all the bibTeX references in the file "references.bib"
@@ -23,16 +25,40 @@ title wherever you want to display the reference list.
 -->
 
 ```{r include = FALSE}
+# general options:
 knitr::knit_hooks$set(margin = function(before, options, envir) {
-  if (before)
-    par(mgp = c(1.5, .5, 0), bty = "n", plt = c(.105, .97, .13, .97))
+  if (before) par(mgp = c(1.5, .5, 0), bty = "n", plt = c(.105, .97, .13, .97))
   else NULL
 })
 
 knitr::opts_chunk$set(margin = TRUE, prompt = TRUE, comment = "",
-                      collapse = TRUE, cache = TRUE,
+                      collapse = TRUE, cache = FALSE, autodep = TRUE,
                       dev.args = list(pointsize = 11), fig.height = 3.5,
                       fig.width = 4.24725, fig.retina = 2, fig.align = "center")
+
+```
+
+```{r include = FALSE}
+# overwritting some functions:
+library <- function(...) base::library(..., warn.conflicts = FALSE, quiet = TRUE)
+require <- function(...) base::require(..., warn.conflicts = FALSE, quiet = TRUE)
+```
+
+```{r include = FALSE, eval = TRUE}
+# redefining the locales:
+l <- "en_US.UTF-8"
+Sys.setenv(LANGAGE = l)
+Sys.setlocale(locale = l)
+Sys.setlocale("LC_MESSAGES", l)
+```
+
+```{r include = FALSE, eval = TRUE}
+# cleaning the packages space:
+search_path <- search()
+pkgs <- c("stats", "graphics", "grDevices", "utils", "datasets", "methods", "base")
+tdet <- grep("package", search_path[!(search_path %in% paste0("package:", pkgs))],
+             value = TRUE)
+for(i in tdet) detach(i, unload = TRUE, character.only = TRUE)
 ```
 
 ```{r include = FALSE}
@@ -40,8 +66,10 @@ workspace <- "/Users/choisy/using_gamar"
 if (dir.exists(workspace)) unlink(workspace, recursive = TRUE)
 dir.create(workspace)
 knitr::opts_knit$set(root.dir = workspace)
-rm(workspace)
+rm(list = ls())
 ```
+
+> Information about the current R session is at the bottom of the document
 
 ## Installing and loading `gamar`
 
@@ -154,7 +182,7 @@ file. For example, loading experiment `sir` from the `sir.gaml` GAML file:
 ```{r}
 dir()
 ls()
-experiment("sir", "sir.gaml")
+sir <- experiment("sir", "sir.gaml") # creates workgamar with sir_1.xml in it
 dir()
 ls()
 ```
@@ -186,20 +214,8 @@ sir
 ```
 
 There are a number of accessor and assignator methods associated to this
-`experiment` class. You can retrieve the name of the experiment:
-
-```{r}
-name(sir)
-```
-
-You can change the name of the experiment:
-
-```{r}
-name(sir) <- "sir1"
-name(sir)
-```
-
-You can retrive the names of the experiment parameters (input and output):
+`experiment` class. You can retrive the names of the experiment parameters
+(input and output):
 
 ```{r}
 names(sir)
@@ -261,18 +277,6 @@ Note the equivalences between the `[` accessor/assignator operator and the
 `name` and `fname` shortcut functions:
 
 ```{r}
-name(sir)
-```
-
-is equivalent to
-
-```{r}
-sir["experiment"]
-```
-
-and
-
-```{r}
 fname(sir)
 ```
 
@@ -331,6 +335,7 @@ thenames <- thenames[!(thenames %in% c("experiment", "sourcePath"))]
 fakedf <- setNames(
   10 * as.data.frame(matrix(round(runif(n*length(thenames)), 4), n)),
   thenames)
+fakedf$id <- 1:7
 ```
 
 ```{r}
@@ -349,7 +354,9 @@ frames:
 
 ```{r}
 names(sir_plan)
-name(sir_plan["1"])
+names(sir_plan["1"])
+# which is equivalent to:
+names(sir_plan[1])
 ```
 
 If we had more explicit row names in the data frame we'd get this:
@@ -358,7 +365,6 @@ If we had more explicit row names in the data frame we'd get this:
 rownames(fakedf) <- paste0("sir", seq_len(nrow(fakedf)))
 (sir_plan <- plan(fakedf, sir))
 ```
-
 
 Note also that you can combine objects of class `experiment` and `plan` in the
 concatenator function `c`:
@@ -383,4 +389,21 @@ names(plan3) <- paste0("sir", seq_along(plan3))
 plan3
 ```
 
-## Simulating experiments
+## Simulating experiments 
+
+```{r eval = TRUE, cache = TRUE}
+out1 <- run(sir, 1, "output1")
+str(out1)
+```
+
+```{r eval = TRUE, cache = TRUE}
+out2 <- run(plan1, 1, "output2")
+str(out2)
+```
+
+## Session information
+
+```{r eval = FALSE}
+sessionInfo()
+```
+
