@@ -1,0 +1,11 @@
+Package: gamar
+Type: Package
+Title: Interface to the Agent-Based Modeling Platform GAMA
+Version: 0.1.0
+Author: Marc Choisy, Lucie Contamin, Ho Bich Hai, Le Viet Thanh, Nicolas Marilleau, Jean-Daniel Zucker
+Maintainer: Marc Choisy <marc.choisy@ird.fr>
+Description: Interface to use and access the GAMA simulation platform from R
+    using the headless mode.
+License: MIT
+LazyData: TRUE
+RoxygenNote: 6.0.1

@@ -1,0 +1,3 @@
+Dans print.experiment ne pas faire apparaître le nom de l'expérience
+
+Supprimer name.experiment
