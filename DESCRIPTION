@@ -8,4 +8,5 @@ Description: Interface to use and access the GAMA simulation platform from R
     using the headless mode.
 License: MIT
 LazyData: TRUE
+Imports: XML, dplyr, plyr
 RoxygenNote: 6.0.1
